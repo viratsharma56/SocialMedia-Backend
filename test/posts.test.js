@@ -61,5 +61,17 @@ describe('Posts', () => {
                     done();
                 })
         })
-     })
+    })
+    describe('/Delete existing post', () => {
+        it('It should not delete a non-existent post', (done) => {
+            chai.request(server)
+                .delete('/api/posts/6347f2987c2612cf04b5ef98')
+                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc0OTVkYTg4MWVlODdjMTgwNGQ3NDEiLCJpYXQiOjE2Njg1ODQ5MjJ9.Ogg2Ap_oMFlRmjOXSwCbS4Lim3zbFeZpR9X7cMucfIc')
+                .end((err, res) => {
+                    res.should.have.status(404)
+                    res.body.should.have.property('message').eql('No post found with this ID.')
+                    done()
+                })
+        })
+    })
 })
