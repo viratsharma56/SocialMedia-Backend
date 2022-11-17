@@ -6,7 +6,7 @@
     "scripts": {
         "start": "cross-env NODE_ENV=dev node api/index.js",
         "dev": "cross-env NODE_ENV=dev nodemon --legacy-watch api/index.js",
-        "test": "cross-env NODE_ENV=test mocha --timeout 60000 --exit"
+        "test": "cross-env NODE_ENV=test PORT=3000 mocha --timeout 120000 --exit"
     },
     "author": "Virat Sharma",
     "license": "ISC",

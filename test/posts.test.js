@@ -21,25 +21,27 @@ before((done) => {
     })
 })
 
-beforeEach((done) => {
-    Post.deleteMany({}, (err) => {
-        done();
-    })
-})
+// beforeEach((done) => {
+//     // Post.deleteMany({}, (err) => {
+//     //     done();
+//     // })
+// })
+
+let postId = "";
 
 describe('Posts', () => {
-    describe('/POST new post', () => { 
+    describe('/POST new post', () => {
         it('Create a new post', (done) => {
             const newPost = {
                 "title": "Title 1",
                 "caption": "Caption 1",
-                // "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc0NzFlZjZhZDQwYzI4YTkzMzdkMWQiLCJpYXQiOjE2Njg1ODM5NjZ9.QT-m1m5z9KLhAZHu6GUD0To2UQme2D7yoUMqEs2wA6Q"
             }
             chai.request(server)
                 .post('/api/posts')
-                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc0OTVkYTg4MWVlODdjMTgwNGQ3NDEiLCJpYXQiOjE2Njg1ODQ5MjJ9.Ogg2Ap_oMFlRmjOXSwCbS4Lim3zbFeZpR9X7cMucfIc')
+                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2MGEwZjVlZDliYjhmOTI4ODc1MWIiLCJpYXQiOjE2Njg2ODAyMDd9.AhOsvxumT6oMPberGuHqca6Q8tOiN-6qJc1s207R-bQ')
                 .send(newPost)
                 .end((err, res) => {
+                    postId = res.body.postData.postID
                     res.should.have.status(201)
                     res.body.should.have.property('postData')
                     done();
@@ -49,11 +51,10 @@ describe('Posts', () => {
             const newPost = {
                 "title": "",
                 "caption": "Caption 1",
-                // "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc0NzFlZjZhZDQwYzI4YTkzMzdkMWQiLCJpYXQiOjE2Njg1ODM5NjZ9.QT-m1m5z9KLhAZHu6GUD0To2UQme2D7yoUMqEs2wA6Q"
             }
             chai.request(server)
                 .post('/api/posts')
-                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc0OTVkYTg4MWVlODdjMTgwNGQ3NDEiLCJpYXQiOjE2Njg1ODQ5MjJ9.Ogg2Ap_oMFlRmjOXSwCbS4Lim3zbFeZpR9X7cMucfIc')
+                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2MGEwZjVlZDliYjhmOTI4ODc1MWIiLCJpYXQiOjE2Njg2ODAyMDd9.AhOsvxumT6oMPberGuHqca6Q8tOiN-6qJc1s207R-bQ')
                 .send(newPost)
                 .end((err, res) => {
                     res.should.have.status(400)
@@ -66,10 +67,48 @@ describe('Posts', () => {
         it('It should not delete a non-existent post', (done) => {
             chai.request(server)
                 .delete('/api/posts/6347f2987c2612cf04b5ef98')
-                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc0OTVkYTg4MWVlODdjMTgwNGQ3NDEiLCJpYXQiOjE2Njg1ODQ5MjJ9.Ogg2Ap_oMFlRmjOXSwCbS4Lim3zbFeZpR9X7cMucfIc')
+                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2MGEwZjVlZDliYjhmOTI4ODc1MWIiLCJpYXQiOjE2Njg2ODAyMDd9.AhOsvxumT6oMPberGuHqca6Q8tOiN-6qJc1s207R-bQ')
                 .end((err, res) => {
                     res.should.have.status(404)
                     res.body.should.have.property('message').eql('No post found with this ID.')
+                    done()
+                })
+        })
+        it('Deletion not allowed by user who is not register with us', (done) => {
+            chai.request(server)
+                .delete(`/api/posts/${postId}`)
+                .set('Authorization', 'eyhhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2MGEwZjVlZDliYjhmOTI4ODc1MWIiLCJpYXQiOjE2Njg2ODAyMDd9.AhOsvxumT6oMPberGuHqca6Q8tOiN-6qJc1s207R-bQ')
+                .end((err, res) => {
+                    if(err) {
+                        console.log(err);
+                        done();
+                    }
+                    res.should.have.status(401)
+                    res.body.should.have.property('message').eql("Please authenticate.")
+                    done()
+                })
+        })
+        it('Deletion not allowed by user who is registered but is not the owner of post', (done) => {
+            chai.request(server)
+                .delete(`/api/posts/${postId}`)
+                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2MTJmM2E5ZWQ4MDk1ZWVhMGRhMjAiLCJpYXQiOjE2Njg2ODI0ODN9.KBidWlKm_qYnSe7ZWZ2_z1r5QSCD58OLXZFgecuumnI')
+                .end((err, res) => {
+                    if(err) {
+                        console.log(err);
+                        done();
+                    }
+                    res.should.have.status(404)
+                    res.body.should.have.property('message').eql("You don't have rights to delete this post")
+                    done()
+                })
+        })
+        it('It should delete a post', (done) => {
+            chai.request(server)
+                .delete(`/api/posts/${postId}`)
+                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2MGEwZjVlZDliYjhmOTI4ODc1MWIiLCJpYXQiOjE2Njg2ODAyMDd9.AhOsvxumT6oMPberGuHqca6Q8tOiN-6qJc1s207R-bQ')
+                .end((err, res) => {
+                    res.should.have.status(200)
+                    res.body.should.have.property('message').eql('Post successfully deleted.')
                     done()
                 })
         })
