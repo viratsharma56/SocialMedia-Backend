@@ -22,7 +22,7 @@ const addUser = async(req, res) => {
 
         await user.save();
         const token = await user.generateAuthToken();
-        res.status(200).json({ message: "User successfully created", token });
+        res.status(200).json({ message: "User successfully created", token, userId: user._id });
 
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -59,7 +59,7 @@ const followPerson = async(req, res) => {
             return res.status(400).json({ message: 'User with this ID does not exist' });
         }
 
-        if (userID === userToFollowID) {
+        if (userID == userToFollowID) {
             return res.status(400).json({ message: 'Cannot follow yourself' });
         }
 
@@ -92,7 +92,7 @@ const unfollowPerson = async(req, res) => {
             return res.status(400).json({ message: 'User with this ID does not exist' });
         }
 
-        if (userID === userToUnfollowID) {
+        if (userID == userToUnfollowID) {
             return res.status(400).json({ message: 'Invalid operation' });
         }
 
@@ -101,7 +101,7 @@ const unfollowPerson = async(req, res) => {
         const followingLists = userDetails.following;
 
         if (!followingLists) {
-            return res.status(400).json({ message: "You already don't follow this user." });
+            return res.status(400).json({ message: "You don't follow this user." });
         }
 
         if (followingLists && !followingLists.includes(mongoose.Types.ObjectId(userToUnfollowID))) {
@@ -138,10 +138,23 @@ const getUser = async(req, res) => {
     }
 }
 
+const deleteUser = async(req, res) => {
+    const userID = req.user._id;
+
+    try {
+        await User.deleteOne({_id: userID});
+        return res.status(200).json({ message: "User deleted" });
+
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
 module.exports = {
     addUser,
     authenticate,
     followPerson,
     unfollowPerson,
-    getUser
+    getUser,
+    deleteUser
 }
