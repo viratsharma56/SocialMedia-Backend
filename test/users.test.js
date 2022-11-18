@@ -8,8 +8,6 @@ const server = require('../api');
 const should = chai.should()
 chai.use(chaiHttp);
 
-const User = require('../api/models/User');
-
 before((done) => {
     mongoose.connect(process.env.MONGO_TEST_URI);
 

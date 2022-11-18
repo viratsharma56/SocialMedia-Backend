@@ -8,8 +8,6 @@ const server = require('../api');
 const should = chai.should()
 chai.use(chaiHttp);
 
-const Post = require('../api/models/Post');
-
 before((done) => {
     mongoose.connect(process.env.MONGO_TEST_URI);
 
@@ -20,12 +18,6 @@ before((done) => {
         console.log('Error in connecting DB: ', error);
     })
 })
-
-// beforeEach((done) => {
-//     // Post.deleteMany({}, (err) => {
-//     //     done();
-//     // })
-// })
 
 let postId = "";
 
@@ -38,7 +30,7 @@ describe('Posts', () => {
             }
             chai.request(server)
                 .post('/api/posts')
-                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2MGEwZjVlZDliYjhmOTI4ODc1MWIiLCJpYXQiOjE2Njg2ODAyMDd9.AhOsvxumT6oMPberGuHqca6Q8tOiN-6qJc1s207R-bQ')
+                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2NDIxZjM4MTc1NDFkNmI3YTFkYjQiLCJpYXQiOjE2Njg2OTQ1NTl9.B4FkD2-qDQAErCkmf1uBaX7XeAxb75MsUB-u7-sD0Zg')
                 .send(newPost)
                 .end((err, res) => {
                     postId = res.body.postData.postID
@@ -54,7 +46,7 @@ describe('Posts', () => {
             }
             chai.request(server)
                 .post('/api/posts')
-                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2MGEwZjVlZDliYjhmOTI4ODc1MWIiLCJpYXQiOjE2Njg2ODAyMDd9.AhOsvxumT6oMPberGuHqca6Q8tOiN-6qJc1s207R-bQ')
+                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2NDIxZjM4MTc1NDFkNmI3YTFkYjQiLCJpYXQiOjE2Njg2OTQ1NTl9.B4FkD2-qDQAErCkmf1uBaX7XeAxb75MsUB-u7-sD0Zg')
                 .send(newPost)
                 .end((err, res) => {
                     res.should.have.status(400)
@@ -66,8 +58,8 @@ describe('Posts', () => {
     describe('/Delete existing post', () => {
         it('It should not delete a non-existent post', (done) => {
             chai.request(server)
-                .delete('/api/posts/6347f2987c2612cf04b5ef98')
-                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2MGEwZjVlZDliYjhmOTI4ODc1MWIiLCJpYXQiOjE2Njg2ODAyMDd9.AhOsvxumT6oMPberGuHqca6Q8tOiN-6qJc1s207R-bQ')
+                .delete(`/api/posts/63773975fb3ff469b773aa9e`)
+                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2NDIxZjM4MTc1NDFkNmI3YTFkYjQiLCJpYXQiOjE2Njg2OTQ1NTl9.B4FkD2-qDQAErCkmf1uBaX7XeAxb75MsUB-u7-sD0Zg')
                 .end((err, res) => {
                     res.should.have.status(404)
                     res.body.should.have.property('message').eql('No post found with this ID.')
@@ -77,7 +69,7 @@ describe('Posts', () => {
         it('Deletion not allowed by user who is not register with us', (done) => {
             chai.request(server)
                 .delete(`/api/posts/${postId}`)
-                .set('Authorization', 'eyhhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2MGEwZjVlZDliYjhmOTI4ODc1MWIiLCJpYXQiOjE2Njg2ODAyMDd9.AhOsvxumT6oMPberGuHqca6Q8tOiN-6qJc1s207R-bQ')
+                .set('Authorization', 'ehJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2NDIxZjM4MTc1NDFkNmI3YTFkYjQiLCJpYXQiOjE2Njg2OTQ1NTl9.B4FkD2-qDQAErCkmf1uBaX7XeAxb75MsUB-u7-sD0Zg')
                 .end((err, res) => {
                     if(err) {
                         console.log(err);
@@ -91,7 +83,7 @@ describe('Posts', () => {
         it('Deletion not allowed by user who is registered but is not the owner of post', (done) => {
             chai.request(server)
                 .delete(`/api/posts/${postId}`)
-                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2MTJmM2E5ZWQ4MDk1ZWVhMGRhMjAiLCJpYXQiOjE2Njg2ODI0ODN9.KBidWlKm_qYnSe7ZWZ2_z1r5QSCD58OLXZFgecuumnI')
+                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2Mjk3OGE1YmZhNWY3NGI5MzY4NjQiLCJpYXQiOjE2Njg2ODgyNDh9.t0gn2-5rV45DBNlC7tDJO76neuJOowAhJvB7mXuFddY')
                 .end((err, res) => {
                     if(err) {
                         console.log(err);
@@ -105,7 +97,7 @@ describe('Posts', () => {
         it('It should delete a post', (done) => {
             chai.request(server)
                 .delete(`/api/posts/${postId}`)
-                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2MGEwZjVlZDliYjhmOTI4ODc1MWIiLCJpYXQiOjE2Njg2ODAyMDd9.AhOsvxumT6oMPberGuHqca6Q8tOiN-6qJc1s207R-bQ')
+                .set('Authorization', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2Mzc2NDIxZjM4MTc1NDFkNmI3YTFkYjQiLCJpYXQiOjE2Njg2OTQ1NTl9.B4FkD2-qDQAErCkmf1uBaX7XeAxb75MsUB-u7-sD0Zg')
                 .end((err, res) => {
                     res.should.have.status(200)
                     res.body.should.have.property('message').eql('Post successfully deleted.')
